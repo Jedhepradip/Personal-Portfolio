@@ -1,10 +1,23 @@
 // src/App.jsx
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail } from 'lucide-react';
-import { SiLinkedin, SiGithub } from 'react-icons/si'; // Ensure react-icons is installed
-const App: React.FC = () => {
+import { Mail, Download, Send } from 'lucide-react';
+import {
+  SiLinkedin, SiGithub, SiHtml5, SiCss3, SiJavascript, SiReact, SiNodedotjs,
+  SiExpress, SiMongodb, SiBootstrap, SiTailwindcss, SiRedux, SiTypescript,
+  SiGit, SiPostman, SiFramer, SiMysql, SiCplusplus, SiC, SiJson
+} from 'react-icons/si';
+
+import resume from "../../../Pradip Jedhe Full Stack Resume 3.pdf"
+
+const App = () => {
   const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState('home');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
 
   useEffect(() => {
     // Simulate loading time
@@ -14,17 +27,44 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission logic here
+    alert(`Thank you for your message, ${formData.name}! I'll get back to you soon.`);
+    setFormData({ name: '', email: '', message: '' });
+  };
+
   if (loading) {
     return <LoadingSkeleton />;
   }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <Header />
-      <Hero />
-      <SkillCards />
-      <Experience />
-      <SocialProfiles />
+      <Header activeSection={activeSection} setActiveSection={setActiveSection} />
+      <main>
+        <section id="home">
+          <Hero />
+        </section>
+        <section id="skills">
+          <SkillCards />
+          <TechnologiesSection />
+        </section>
+        <section id="experience">
+          <Experience />
+        </section>
+        <section id="contact">
+          <ContactSection handleFormChange={handleFormChange} handleFormSubmit={handleFormSubmit} formData={formData} />
+        </section>
+        <SocialProfiles />
+      </main>
       <Footer />
     </div>
   );
@@ -65,9 +105,21 @@ function LoadingSkeleton() {
   );
 }
 
-function Header() {
+function Header({ activeSection, setActiveSection }) {
+  const navItems = [
+    { id: 'home', label: 'Home' },
+    { id: 'skills', label: 'Skills' },
+    { id: 'experience', label: 'Experience' },
+    { id: 'contact', label: 'Contact' }
+  ];
+
+  const handleNavClick = (id) => {
+    setActiveSection(id);
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <header className="py-4 px-6 flex justify-between items-center">
+    <header className="py-4 px-6 flex justify-between items-center sticky top-0 bg-gray-900 bg-opacity-90 backdrop-blur-sm z-50">
       <motion.div
         initial={{ x: -50, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -82,10 +134,16 @@ function Header() {
         transition={{ duration: 0.5 }}
       >
         <ul className="flex space-x-6">
-          <li className="hover:text-blue-400 cursor-pointer">Home</li>
-          <li className="hover:text-blue-400 cursor-pointer">Skills</li>
-          <li className="hover:text-blue-400 cursor-pointer">Experience</li>
-          <li className="hover:text-blue-400 cursor-pointer">Contact</li>
+          {navItems.map(item => (
+            <li
+              key={item.id}
+              onClick={() => handleNavClick(item.id)}
+              className={`cursor-pointer transition-colors ${activeSection === item.id ? 'text-blue-400' : 'hover:text-blue-400'
+                }`}
+            >
+              {item.label}
+            </li>
+          ))}
         </ul>
       </motion.nav>
     </header>
@@ -94,7 +152,7 @@ function Header() {
 
 function Hero() {
   return (
-    <section className="py-20 px-6 flex flex-col items-center justify-center text-center">
+    <section className="py-20 px-6 flex flex-col items-center justify-center text-center min-h-screen">
       <motion.h1
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -115,21 +173,37 @@ function Hero() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.7, delay: 0.4 }}
-        className="max-w-2xl text-gray-300"
+        className="max-w-2xl text-gray-300 mb-8"
       >
         I create responsive and dynamic web applications using modern technologies.
         Passionate about crafting clean, efficient code and delivering exceptional user experiences.
       </motion.p>
-      <motion.button
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.7, delay: 0.6 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="mt-8 px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-      >
-        View My Work
-      </motion.button>
+      <div className="flex flex-wrap justify-center gap-4">
+        <motion.a
+          href="#contact"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.6 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+        >
+          <span>Contact Me</span>
+        </motion.a>
+        <motion.a
+          href="resume"
+          download="pradip_resume.pdf"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.7 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-6 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
+        >
+          <Download size={18} />
+          <span>Download Resume</span>
+        </motion.a>
+      </div>
     </section>
   );
 }
@@ -184,9 +258,63 @@ function SkillCards() {
   );
 }
 
-function Experience() {
+function TechnologiesSection() {
+  const technologies = [
+    { icon: SiHtml5, name: "HTML5", color: "text-orange-500" },
+    { icon: SiCss3, name: "CSS3", color: "text-blue-400" },
+    { icon: SiJavascript, name: "JavaScript", color: "text-yellow-400" },
+    { icon: SiReact, name: "React.js", color: "text-blue-300" },
+    { icon: SiTailwindcss, name: "Tailwind CSS", color: "text-teal-400" },
+    { icon: SiRedux, name: "Redux Toolkit", color: "text-purple-400" },
+    { icon: SiNodedotjs, name: "Node.js", color: "text-green-500" },
+    { icon: SiExpress, name: "Express.js", color: "text-gray-400" },
+    { icon: SiMongodb, name: "MongoDB", color: "text-green-400" },
+    { icon: SiBootstrap, name: "Bootstrap", color: "text-purple-500" },
+    { icon: SiTypescript, name: "TypeScript", color: "text-blue-500" },
+    { icon: SiGit, name: "Git", color: "text-orange-600" },
+    { icon: SiGithub, name: "GitHub", color: "text-gray-300" },
+    { icon: SiPostman, name: "Postman API", color: "text-orange-500" },
+    { icon: SiFramer, name: "Framer Motion", color: "text-pink-400" },
+    { icon: SiMysql, name: "MySQL", color: "text-blue-600" },
+    { icon: SiCplusplus, name: "C++", color: "text-blue-500" },
+    { icon: SiC, name: "C", color: "text-blue-400" },
+    { icon: SiJson, name: "JSON", color: "text-yellow-300" },
+  ];
+
   return (
     <section className="py-16 px-6 bg-gray-800">
+      <motion.h2
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="text-3xl font-bold text-center mb-12"
+      >
+        Technologies I Work With
+      </motion.h2>
+      <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        {technologies.map((tech, index) => (
+          <motion.div
+            key={tech.name}
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: index * 0.05 }}
+            whileHover={{ y: -5, scale: 1.1 }}
+            className="flex flex-col items-center justify-center bg-gray-700 p-4 rounded-lg"
+          >
+            <tech.icon className={`text-4xl ${tech.color} mb-2`} />
+            <span className="text-sm text-center">{tech.name}</span>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Experience() {
+  return (
+    <section className="py-16 px-6 bg-gray-900">
       <motion.h2
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -232,10 +360,82 @@ function Experience() {
   );
 }
 
+function ContactSection({ handleFormChange, handleFormSubmit, formData }) {
+  return (
+    <section className="py-16 px-6">
+      <motion.h2
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="text-3xl font-bold text-center mb-12"
+      >
+        Contact Me
+      </motion.h2>
+      <div className="max-w-2xl mx-auto">
+        <motion.form
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="bg-gray-800 p-8 rounded-lg"
+          onSubmit={handleFormSubmit}
+        >
+          <div className="mb-4">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleFormChange}
+              required
+              className="w-full p-3 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              placeholder="Your name"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleFormChange}
+              required
+              className="w-full p-3 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              placeholder="your@email.com"
+            />
+          </div>
+          <div className="mb-6">
+            <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              value={formData.message}
+              onChange={handleFormChange}
+              required
+              rows="5"
+              className="w-full p-3 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white resize-none"
+              placeholder="Your message..."
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+          >
+            <Send size={18} />
+            Send Message
+          </button>
+        </motion.form>
+      </div>
+    </section>
+  );
+}
+
 function SocialProfiles() {
   return (
-
-    <section className="py-16 px-6">
+    <section className="py-16 px-6 bg-gray-800">
       <motion.h2
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -300,7 +500,7 @@ function SocialProfiles() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="bg-gray-800 p-6 rounded-lg mb-8"
+          className="bg-gray-900 p-6 rounded-lg mb-8"
         >
           <p className="italic mb-4">
             "LinkedIn is a business and employment-focused social media platform that works through websites and mobile apps."
@@ -313,7 +513,7 @@ function SocialProfiles() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="bg-gray-800 p-6 rounded-lg"
+          className="bg-gray-900 p-6 rounded-lg"
         >
           <p className="italic mb-4">
             "Also do check out my Github Profile where I have shared all my codes from basic to advanced."
@@ -322,13 +522,12 @@ function SocialProfiles() {
         </motion.div>
       </div>
     </section>
-  )
-
+  );
 }
 
 function Footer() {
   return (
-    <footer className="py-8 px-6 bg-gray-800 text-center">
+    <footer className="py-8 px-6 bg-gray-900 text-center">
       <motion.p
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -341,4 +540,5 @@ function Footer() {
     </footer>
   );
 }
+
 export default App;
